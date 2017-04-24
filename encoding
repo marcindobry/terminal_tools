@@ -1,0 +1,53 @@
+#! /usr/bin/env python3
+
+import sys
+import os
+
+import docopt
+
+from base64 import b64decode, b64encode
+from urllib.parse import quote_plus, unquote_plus
+
+def uri_encode(input):
+	return quote_plus(input)
+
+
+def uri_decode(input):
+	return unquote_plus(input)
+
+
+def base64_encode(input):
+	b_input = bytes(input, 'utf-8')
+	b64encoded = b64encode(b_input)
+	return str(b64encoded, 'utf-8')
+
+
+def base64_decode(input):
+	input = fill_padding(input)
+	b_input = bytes(input, 'utf-8')
+	b64decoded = b64decode(bytes(input, 'utf-8'))
+	return str(b64decoded, 'utf-8')
+
+
+def fill_padding(input):
+	missing_padding = 4 - len(input) % 4
+	return input + '=' * missing_padding
+
+
+if __name__ == '__main__':
+	input = sys.argv[1:]
+
+	if not os.isatty(sys.stdin.fileno()):
+		input.append(sys.stdin.read().strip())
+
+	print(input)
+
+	if input[0] == 'b64d':
+		print(base64_decode(input[1]))
+	if input[0] == 'b64e':
+		print(base64_encode(input[1]))
+	if input[0] == 'urie':
+		print(uri_encode(input[1]))
+	if input[0] == 'urid':
+		print(uri_decode(input[1]))
+
